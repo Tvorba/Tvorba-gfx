@@ -1,0 +1,9 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define VERSION_MAJOR @tvorba_VERSION_MAJOR@
+#define VERSION_MINOR @tvorba_VERSION_MINOR@
+#define VERSION_PATCH @tvorba_VERSION_PATCH@
+#define VERSION_TAG @tvorba_VERSION_TAG@
+#define VERSION "@tvorba_VERSION@"
+#endif // CONFIG_H
