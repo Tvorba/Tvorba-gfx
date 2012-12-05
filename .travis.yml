@@ -13,6 +13,6 @@ before_install:
  - sudo apt-get install libsdl2 -qq
 
 script:
- - cmake
+ - cmake .
  - make
 
