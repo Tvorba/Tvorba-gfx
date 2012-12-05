@@ -1,0 +1,18 @@
+branches:
+  only:
+    - master
+
+language: cpp
+compiler:
+  - clang
+  - gcc
+
+before_install:
+ - sudo add-apt-repository ppa:pj-assis/testing
+ - sudo apt-get update -qq
+ - sudo apt-get install libsdl2 -qq
+
+script:
+ - cmake
+ - make
+
