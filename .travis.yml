@@ -8,7 +8,7 @@ compiler:
   - gcc
 
 before_install:
- - sudo add-apt-repository ppa:pj-assis/testing
+ - sudo add-apt-repository ppa:pj-assis/testing -y
  - sudo apt-get update -qq
  - sudo apt-get install libsdl2 -qq
 
