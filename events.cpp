@@ -1,16 +1,16 @@
 #include <events.h>
 
-int eventLoop(void *pWindow)
+int event_loop(void *context)
 {
-  SDL_Window *window = (SDL_Window*) pWindow;
+  Context *main_context = (Context*) context;
   SDL_Event *event = new SDL_Event;
 
-  while(true)
+  while(!main_context->is_quiting)
     {
       if(SDL_WaitEvent(event) == 0)
         {
           fprintf(stderr, "ERROR waiting for events: %s", SDL_GetError());
-          return EXIT_FAILURE;
+          //return EXIT_FAILURE;
         }
 
 /*#ifdef DEBUG
@@ -23,7 +23,8 @@ int eventLoop(void *pWindow)
 #ifdef DEBUG
           fputs("DEBUG: Qutting\n", stderr);
 #endif
-          return EXIT_SUCCESS;
+          main_context->is_quiting = true;
+          main_context->return_value = EXIT_SUCCESS;
           break;
 
         case SDL_KEYDOWN:

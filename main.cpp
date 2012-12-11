@@ -3,66 +3,70 @@
 #include <unistd.h>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_opengl.h>
 
-#include <globals.h>
+#include <config.h>
+#include <context.h>
 #include <events.h>
+#include <render.h>
 
 #define WIDTH 640
 #define HEIGHT 480
 
-void quit(int ret);
+using namespace tvorba;
 
-void checkError(int line = -1)
+inline void quit(int ret, Context *main_context);
+
+inline void checkError(int line = -1)
 {
-  fputs(SDL_GetError(), stderr);
+  const char *err = SDL_GetError();
+  if(strlen(err))
+    {
+      fprintf(stderr, "%s on line %i\n", err, line);
+    }
 }
 
 int main(int argc, char **argv)
 {
   SDL_Init(SDL_INIT_VIDEO);
 
-  fprintf(stderr, "Tvorba 0.1.0-alpha on %s\n", SDL_GetPlatform());
+  fprintf(stderr, "Tvorba-" VERSION " on %s\n", SDL_GetPlatform());
 
-  /*  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE); */
+  Context *main_context = new Context();
 
-  pWindow  = SDL_CreateWindow("Tvorba 0.1.0-alpha",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              WIDTH, HEIGHT,
-                              SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
-                            #ifndef DEBUG
-                              | SDL_WINDOW_FULLSCREEN
-                            #endif
-                              );
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-  if(pWindow == NULL)
+  main_context->window  = SDL_CreateWindow("Tvorba-" VERSION,
+                                           SDL_WINDOWPOS_UNDEFINED,
+                                           SDL_WINDOWPOS_UNDEFINED,
+                                           WIDTH, HEIGHT,
+                                           SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
+                                         #ifndef DEBUG
+                                           | SDL_WINDOW_FULLSCREEN
+                                         #endif
+                                           );
+
+  if(main_context->window == NULL)
     {
       fprintf(stderr, "ERROR: Could not create window: %s\n", SDL_GetError());
-      quit(EXIT_FAILURE);
+      quit(EXIT_FAILURE, main_context);
     }
 
-  glContext = SDL_GL_CreateContext(pWindow);
-  if(glContext == NULL)
+  main_context->gl_context = SDL_GL_CreateContext(main_context->window);
+  if(main_context->gl_context == NULL)
     {
-      fprintf(stderr, "ERROR: Could not create opengl context: %s\n", SDL_GetError());
-      quit(EXIT_FAILURE);
+      fprintf(stderr, "ERROR: Could not create OpenGL context: %s\n", SDL_GetError());
+      quit(EXIT_FAILURE, main_context);
+    }
+
+  if (glewInit() != GLEW_OK)
+    {
+      fprintf(stderr, "ERROR: Failed to initialize GLEW\n");
+      quit(EXIT_FAILURE, main_context);
     }
 
   checkError(__LINE__);
-
-#ifndef DEBUG
-  glClearColor(0.0, 0.0, 0.0, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
-  SDL_GL_SwapWindow(pWindow);
-#else
-  glClearColor(0.0, 1.0, 0.0, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
-  SDL_GL_SwapWindow(pWindow);
-#endif
 
   SDL_ShowCursor(SDL_DISABLE);
   if(SDL_ShowCursor(SDL_QUERY) != SDL_DISABLE)
@@ -70,15 +74,26 @@ int main(int argc, char **argv)
       fputs("WARN: Unable to hide cursor.", stderr);
     }
 
-  eventThread = SDL_CreateThread(eventLoop, "Events", pWindow);
-//  logicThread = SDL_CreateThread(logicLoop, eventThread);
-  int ret;
-  SDL_WaitThread(eventThread, &ret);
-  quit(ret);
+  SDL_GL_MakeCurrent(main_context->window, NULL); // Free OpenGL acces from this thread
+
+  main_context->render_thread = SDL_CreateThread(render_loop, "Graphics", main_context);
+  main_context->event_thread = SDL_CreateThread(event_loop, "Events", main_context);
+  //main_context->logic_thread = SDL_CreateThread(logic_loop, main_context);
+
+  while(!main_context->is_quiting)
+    {
+      // nothing
+    }
+
+    delete main_context;
+    return main_context->return_value;
+
 }
 
-void quit(int ret)
+void quit(int ret, Context *main_context)
 {
-  SDL_DestroyWindow(pWindow);
-  exit(ret);
+  main_context->is_quiting = true;
+  main_context->return_value = ret;
+  delete main_context;
+  exit(main_context->return_value);
 }
