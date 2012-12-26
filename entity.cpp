@@ -16,12 +16,16 @@
  */
 
 #include "entity.h"
+#include <context.h>
+#include <event.h>
 
 namespace tvorba
 {
 
   Entity::Entity()
   {
+    this->_event  = default_event_handler;
+    this->_render = default_null_renderer;
   }
 
   bool Entity::pop()
@@ -41,9 +45,26 @@ namespace tvorba
     return true;
   }
 
-  void Entity::render(void)
+  void Entity::all(std::function<void (Entity*)> function)
   {
+    function(this);
+    if(next != nullptr)
+      next->all(function);
+  }
 
+  void Entity::all(Entity *entity, std::function<void (Entity*)> function)
+  {
+    entity->all(function);
+  }
+
+  void Entity::on_event(std::function<void (Entity *, Event *)> function)
+  {
+    _event = std::bind(function, this, std::placeholders::_1);
+  }
+
+  void Entity::on_render(std::function<void (Entity *, Context *)> function)
+  {
+    _render = std::bind(function, this, std::placeholders::_1);
   }
 
 }

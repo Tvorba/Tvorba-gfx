@@ -15,6 +15,9 @@
  * along with this code. If not, see <http://www.perlfoundation.org/artistic_license_2_0>
  */
 
+#include <functional>
+#include <queue>
+
 #include <SDL2/SDL.h>
 
 #ifndef ENTITY_H
@@ -22,16 +25,47 @@
 
 namespace tvorba
 {
+  class Context;
+  class Event;
 
   class Entity
   {
   public:
     Entity();
 
-    Entity *previous, *next;
+    Entity *previous, *parent, *children, *next;
     bool pop(void);
     bool push(Entity *entity);
-    void render(void);
+    void all(std::function<void(Entity *)> function);
+    static void all(Entity *entity, std::function<void(Entity *)> function);
+
+    bool is_render_visible;
+
+    inline void event(Event *e)
+    {
+      _event(e);
+    };
+
+    inline void render(Context *context)
+    {
+      _render(context);
+    };
+
+    void on_event(std::function<void(Entity*, Event*)> function);
+    void on_render(std::function<void(Entity*, Context*)> function);
+
+    void *user_data;
+
+    std::queue<Event*> events;
+
+  private:
+    std::function<void(Event*)> _event;
+    static std::function<void(Event*)> default_event_handler = [this](Event *e){};
+
+    std::function<void(Context*)> _render;
+    static std::function<void(Context*)> default_null_renderer = [this](Context *c){};
+
+
   };
 
 }

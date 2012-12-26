@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 project (tvorba-gfx)
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 SET(tvorba_VERSION_MAJOR 0)
 SET(tvorba_VERSION_MINOR 1)
@@ -49,7 +49,7 @@ include_directories(${GLEW_INCLUDE_DIR})
 find_package(SDL2 REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
 
-add_executable(gfx main.cpp events.cpp render.cpp context.cpp entity.cpp)
+add_executable(gfx main.cpp events.cpp render.cpp context.cpp entity.cpp event.cpp)
 
 configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 include_directories(${CMAKE_SOURCE_DIR})

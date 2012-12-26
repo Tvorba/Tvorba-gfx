@@ -22,7 +22,8 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-using namespace tvorba;
-int event_loop(void *context);
+namespace tvorba {
+  int event_loop(void *context);
+};
 
 #endif // EVENTS_H

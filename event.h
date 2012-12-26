@@ -1,4 +1,4 @@
-/* context.h
+/* event.h
  * Copyright (C) 2012, Lucas Dohring.
  *
  * This code is free software; you can redistribute it and/or
@@ -15,41 +15,28 @@
  * along with this code. If not, see <http://www.perlfoundation.org/artistic_license_2_0>
  */
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
+#include <SDL2/SDL.h>
 
-#include <thread>
-#include <chrono>
-
-#include <entity.h>
-
-#ifndef RENDERCONTEXT_H
-#define RENDERCONTEXT_H
+#ifndef EVENT_H
+#define EVENT_H
 
 namespace tvorba {
-  using namespace glm;
-  using namespace std;
-
-  class Context
+  typedef enum {
+    SDL_EVENT=0,
+    NETWORK_EVENT,
+    APP_EVENT
+  } Event_Type;
+  class Event
   {
   public:
-    Context();
-    void init_graphics(char *title);
+    Event();
+    Event(SDL_Event *event);
+    Event_Type Type(void);
 
-    unsigned num_threads;
-    thread **threads;
-
-    SDL_Window *window;
-    SDL_GLContext gl_context;
-
-    mat4 view, projection;
-    Entity entities;
-
-    bool is_quiting;
-    int return_value;
-
-    ~Context();
+  private:
+    void *e;
+    Event_Type type;
   };
 }
 
-#endif // RENDERCONTEXT_H
+#endif // EVENT_H

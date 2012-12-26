@@ -1,4 +1,4 @@
-/* context.h
+/* tvorba.h
  * Copyright (C) 2012, Lucas Dohring.
  *
  * This code is free software; you can redistribute it and/or
@@ -15,41 +15,13 @@
  * along with this code. If not, see <http://www.perlfoundation.org/artistic_license_2_0>
  */
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
+#ifndef TVORBA_H
+#define TVORBA_H
 
-#include <thread>
-#include <chrono>
-
+#include <context.h>
 #include <entity.h>
+#include <event.h>
+#include <events.h>
+#include <render.h>
 
-#ifndef RENDERCONTEXT_H
-#define RENDERCONTEXT_H
-
-namespace tvorba {
-  using namespace glm;
-  using namespace std;
-
-  class Context
-  {
-  public:
-    Context();
-    void init_graphics(char *title);
-
-    unsigned num_threads;
-    thread **threads;
-
-    SDL_Window *window;
-    SDL_GLContext gl_context;
-
-    mat4 view, projection;
-    Entity entities;
-
-    bool is_quiting;
-    int return_value;
-
-    ~Context();
-  };
-}
-
-#endif // RENDERCONTEXT_H
+#endif // TVORBA_H
