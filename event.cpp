@@ -1,4 +1,4 @@
-/* render.h
+/* event.cpp
  * Copyright (C) 2012, Lucas Dohring.
  *
  * This code is free software; you can redistribute it and/or
@@ -15,24 +15,24 @@
  * along with this code. If not, see <http://www.perlfoundation.org/artistic_license_2_0>
  */
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-
-#include <context.h>
-
-#ifndef RENDER_H
-#define RENDER_H
+#include "event.h"
 
 namespace tvorba {
-  using namespace glm;
-  int render_loop(Context *main_context);
-}
 
-#endif // RENDER_H
+  Event::Event()
+  {
+  }
+
+  Event::Event(SDL_Event *event)
+  {
+    if(event == nullptr)
+      return;
+    e = event;
+  }
+
+  Event_Type Event::Type()
+  {
+    return type;
+  }
+
+}

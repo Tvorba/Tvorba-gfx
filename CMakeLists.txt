@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 project (tvorba-gfx)
+set(CMAKE_CXX_FLAGS "-std=c++11")
 
 SET(tvorba_VERSION_MAJOR 0)
 SET(tvorba_VERSION_MINOR 1)
@@ -34,7 +35,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
 endif()
 
-find_package(OpenMP REQUIRED)
+find_package(OpenMP QUIET)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
@@ -45,11 +46,10 @@ include_directories(${OPENGL_INCLUDE_DIR})
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIR})
 
-
 find_package(SDL2 REQUIRED)
 include_directories(${SDL_INCLUDE_DIR})
 
-add_executable(gfx main.cpp events.cpp render.cpp context.cpp entity.cpp)
+add_executable(gfx main.cpp events.cpp render.cpp context.cpp entity.cpp event.cpp)
 
 configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "${PROJECT_BINARY_DIR}/config.h")
 include_directories(${CMAKE_SOURCE_DIR})
